@@ -27,11 +27,12 @@ for selector in selectors:
 
 while count < job_limit:
     page_count += 1
-    print("Page", page_count)
+    place_on_page = 0
     response = requests.get(search_url, params = {"p": str(page_count)})
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find(class_='search-results-list')
     for item in results.select('li'):
+        place_on_page += 1
         location = item.find(class_='job-location')
         if location.text.startswith('Cambridge') or location.text.startswith('Multiple'):
             title = item.find('h2')
@@ -59,7 +60,7 @@ while count < job_limit:
             location_text = location_data.text;
             if "Cambridge" in location_text:
                 count += 1
-                print("{0:3}".format(count), "{0:10}".format(id_data_text), title.text, job_date)
+                print("{0:2}".format(page_count), "{0:2}".format(place_on_page), "{0:10}".format(id_data_text), title.text, job_date)
 
 print("Total:", count)
 
