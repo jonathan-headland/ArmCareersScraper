@@ -61,7 +61,7 @@ while count < job_limit:
             location_text = location_data.text;
             if "Cambridge" in location_text:
                 count += 1
-                print("{0:2}".format(page_count), "{0:2}".format(place_on_page), "{0:10}".format(id_data_text), title.text, job_date)
+                #print("{0:2}".format(page_count), "{0:2}".format(place_on_page), "{0:10}".format(id_data_text), title.text, job_date)
                 the_job = {
                         "date":  job_date,
                         "page":  page_count,
@@ -71,10 +71,9 @@ while count < job_limit:
                         }
                 job_list.append(the_job)
 
-print("Total:", count)
-print("Total:", len(job_list))
+print("Total found:", len(job_list))
 
-job_list.sort(reverse=True, key=lambda x: x['date'])
+job_list.sort(reverse=False, key=lambda x: x['date'])
 
 for job in job_list:
     date = job["date"]
