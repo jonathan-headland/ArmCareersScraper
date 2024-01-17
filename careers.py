@@ -25,6 +25,7 @@ for selector in selectors:
                     job_limit = int(city['data-count'])
                     print(city['data-display'], "has", job_limit)
 
+job_list = []
 while count < job_limit:
     page_count += 1
     place_on_page = 0
@@ -61,6 +62,25 @@ while count < job_limit:
             if "Cambridge" in location_text:
                 count += 1
                 print("{0:2}".format(page_count), "{0:2}".format(place_on_page), "{0:10}".format(id_data_text), title.text, job_date)
+                the_job = {
+                        "date":  job_date,
+                        "page":  page_count,
+                        "line":  place_on_page,
+                        "id":    id_data_text,
+                        "title": title.text
+                        }
+                job_list.append(the_job)
 
 print("Total:", count)
+print("Total:", len(job_list))
 
+job_list.sort(reverse=True, key=lambda x: x['date'])
+
+for job in job_list:
+    date = job["date"]
+    page = job["page"]
+    line = job["line"]
+    identifier = job["id"]
+    title = job["title"]
+    date_str = date.strftime("%Y-%m-%d")
+    print(date_str, "{0:2}".format(page), "{0:2}".format(line), "{0:10}".format(identifier), title)
