@@ -13,6 +13,11 @@ count = 0
 response = requests.get(search_url)
 soup = BeautifulSoup(response.content, 'html.parser')
 
+page_total_message = soup.find(class_='pagination-total-pages')
+page_total_string = page_total_message.text.split("of ")[1]
+page_total = int(page_total_string)
+print("Number of pages:", page_total)
+
 search_filters = soup.find(id='search-filters')
 selectors = search_filters.select("section", class_="expandable")
 for selector in selectors:
@@ -26,9 +31,10 @@ for selector in selectors:
                     print(city['data-display'], "has", job_limit)
 
 job_list = []
-while count < job_limit:
+while count < job_limit and page_count < page_total:
     page_count += 1
     place_on_page = 0
+    print("Processing page:", page_count)
     response = requests.get(search_url, params = {"p": str(page_count)})
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find(class_='search-results-list')
