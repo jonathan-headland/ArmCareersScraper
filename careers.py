@@ -44,7 +44,8 @@ while count < job_limit and page_count < page_total:
         if location.text.startswith('Cambridge') or location.text.startswith('Multiple'):
             title = item.find('h2')
             link = item.find('a')
-            job_details = requests.get(base_url + link['href'])
+            job_url = base_url + link['href']
+            job_details = requests.get(job_url)
             job_soup = BeautifulSoup(job_details.content, 'html.parser')
             the_id = job_soup.find(class_='job-id')
             id_data = the_id.find(class_='job-info--data')
@@ -68,8 +69,12 @@ while count < job_limit and page_count < page_total:
                         # nov.. 01, 2023
                         job_date = datetime.strptime(date_text, '%b.. %d, %Y')
                     except:
-                        # Chinese date format (month)
-                        job_date = datetime.strptime(date_text, '%m月. %d, %Y')
+                        try:
+                            # Chinese date format (month)
+                            job_date = datetime.strptime(date_text, '%m月. %d, %Y')
+                        except:
+                            print("Unable to process date", date_text, "from", job_url)
+                            continute
 
                 location_data = the_location.find(class_='job-info--data')
 
@@ -82,7 +87,8 @@ while count < job_limit and page_count < page_total:
                         "page":  page_count,
                         "line":  place_on_page,
                         "id":    id_data_text,
-                        "title": title.text
+                        "title": title.text,
+                        "url":   job_url
                         }
                 job_list.append(the_job)
 
@@ -96,5 +102,6 @@ for job in job_list:
     line = job["line"]
     identifier = job["id"]
     title = job["title"]
+    url = job["url"]
     date_str = date.strftime("%Y-%m-%d")
-    print(date_str, "{0:2}".format(page), "{0:2}".format(line), "{0:10}".format(identifier), title)
+    print(date_str, "{0:2}".format(page), "{0:2}".format(line), "{0:10}".format(identifier), title, url)
