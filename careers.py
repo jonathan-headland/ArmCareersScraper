@@ -96,6 +96,7 @@ print("Total found:", len(job_list))
 
 job_list.sort(reverse=False, key=lambda x: x['date'])
 
+print_count = 0
 for job in job_list:
     date = job["date"]
     page = job["page"]
@@ -105,3 +106,6 @@ for job in job_list:
     url = job["url"]
     date_str = date.strftime("%Y-%m-%d")
     print(date_str, "{0:2}".format(page), "{0:2}".format(line), "{0:10}".format(identifier), title, url)
+    print_count += 1
+
+print("Processed", print_count, "of expected", job_limit)
