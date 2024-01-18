@@ -61,7 +61,16 @@ while count < job_limit and page_count < page_total:
                 id_data_text = id_data.text
                 date_data = the_date.find(class_='job-info--data')
                 date_text = date_data.text
-                job_date = datetime.strptime(date_text, '%b. %d, %Y')
+                try:
+                    job_date = datetime.strptime(date_text, '%b. %d, %Y')
+                except:
+                    try:
+                        # nov.. 01, 2023
+                        job_date = datetime.strptime(date_text, '%b.. %d, %Y')
+                    except:
+                        # Chinese date format (month)
+                        job_date = datetime.strptime(date_text, '%m月. %d, %Y')
+
                 location_data = the_location.find(class_='job-info--data')
 
             location_text = location_data.text;
