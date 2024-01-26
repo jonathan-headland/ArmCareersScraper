@@ -10,6 +10,16 @@ search_url = base_url + '/search-jobs'
 page_count = 0
 count = 0
 
+def id_to_number(a_job_id):
+    ''' Convert a string in format 2023-10125 to a sortable integer '''
+    components = a_job_id.split('-')
+    major_part = components[0]
+    major_num  = int(major_part)
+    minor_part = components[1]
+    minor_num  = int(minor_part)
+    result = 100000 * major_num + minor_num
+    return result
+
 response = requests.get(search_url)
 soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -74,10 +84,11 @@ while count < job_limit and page_count < page_total:
                             job_date = datetime.strptime(date_text, '%m月. %d, %Y')
                         except:
                             print("Unable to process date", date_text, "from", job_url)
-                            continute
+                            job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
 
                 location_data = the_location.find(class_='job-info--data')
 
+            id_as_number = id_to_number(id_data_text)
             location_text = location_data.text;
             if "Cambridge" in location_text:
                 count += 1
@@ -87,6 +98,7 @@ while count < job_limit and page_count < page_total:
                         "page":  page_count,
                         "line":  place_on_page,
                         "id":    id_data_text,
+                        "index": id_as_number,
                         "title": title.text,
                         "url":   job_url
                         }
@@ -94,7 +106,7 @@ while count < job_limit and page_count < page_total:
 
 print("Total found:", len(job_list))
 
-job_list.sort(reverse=False, key=lambda x: x['date'])
+job_list.sort(reverse=False, key=lambda x: (x['date'], x['index']))
 
 print_count = 0
 for job in job_list:
