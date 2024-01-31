@@ -1,8 +1,6 @@
 import requests
 
 from bs4 import BeautifulSoup
-import pandas as pd
-import time
 from datetime import datetime
 
 base_url = 'https://careers.arm.com'
