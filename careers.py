@@ -64,7 +64,10 @@ while count < job_limit and page_count < page_total:
             if id_data == None: # Older format page
                 id_data_text = the_id.text
                 date_text = the_date.text
-                job_date = datetime.strptime(date_text, '%m/%d/%Y')
+                try:
+                    job_date = datetime.strptime(date_text, '%m/%d/%Y')
+                except:
+                    job_date = datetime.strptime(date_text, '%m.%d.%Y')
                 location_data = job_soup.find(class_='ajd_header__location')
             else:
                 id_data_text = id_data.text
@@ -115,7 +118,7 @@ for job in job_list:
     title = job["title"]
     url = job["url"]
     date_str = date.strftime("%Y-%m-%d")
-    print(date_str, "{0:2}".format(page), "{0:2}".format(line), "{0:10}".format(identifier), title, url)
     print_count += 1
+    print("{0:3}".format(print_count), date_str, "{0:2}".format(page), "{0:2}".format(line), "{0:10}".format(identifier), title, url)
 
 print("Processed", print_count, "of expected", job_limit)
