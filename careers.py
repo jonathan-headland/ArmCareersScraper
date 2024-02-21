@@ -23,15 +23,21 @@ def parse_date(a_text: str):
         job_date = datetime.strptime(date_text, '%b. %d, %Y')
     except:
         try:
-            # nov.. 01, 2023
-            job_date = datetime.strptime(date_text, '%b.. %d, %Y')
+            job_date = datetime.strptime(date_text, '%m/%d/%Y')
         except:
             try:
-	        # Chinese date format (month)
-                job_date = datetime.strptime(date_text, '%m月. %d, %Y')
+                job_date = datetime.strptime(date_text, '%m.%d.%Y')
             except:
-                print("Unable to process date", date_text, "from", job_url)
-                job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
+                try:
+                    # nov.. 01, 2023
+                    job_date = datetime.strptime(date_text, '%b.. %d, %Y')
+                except:
+                    try:
+	                # Chinese date format (month)
+                        job_date = datetime.strptime(date_text, '%m月. %d, %Y')
+                    except:
+                        print("Unable to process date", date_text, "from", job_url)
+                        job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
     return job_date
 
 response = requests.get(search_url)
