@@ -18,6 +18,22 @@ def id_to_number(a_job_id):
     result = 100000 * major_num + minor_num
     return result
 
+def parse_date(a_text: str):
+    try:
+        job_date = datetime.strptime(date_text, '%b. %d, %Y')
+    except:
+        try:
+            # nov.. 01, 2023
+            job_date = datetime.strptime(date_text, '%b.. %d, %Y')
+        except:
+            try:
+	        # Chinese date format (month)
+                job_date = datetime.strptime(date_text, '%m月. %d, %Y')
+            except:
+                print("Unable to process date", date_text, "from", job_url)
+                job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
+    return job_date
+
 response = requests.get(search_url)
 soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -64,29 +80,13 @@ while count < job_limit and page_count < page_total:
             if id_data == None: # Older format page
                 id_data_text = the_id.text
                 date_text = the_date.text
-                try:
-                    job_date = datetime.strptime(date_text, '%m/%d/%Y')
-                except:
-                    job_date = datetime.strptime(date_text, '%m.%d.%Y')
+                job_date = parse_date(date_text)
                 location_data = job_soup.find(class_='ajd_header__location')
             else:
                 id_data_text = id_data.text
                 date_data = the_date.find(class_='job-info--data')
                 date_text = date_data.text
-                try:
-                    job_date = datetime.strptime(date_text, '%b. %d, %Y')
-                except:
-                    try:
-                        # nov.. 01, 2023
-                        job_date = datetime.strptime(date_text, '%b.. %d, %Y')
-                    except:
-                        try:
-                            # Chinese date format (month)
-                            job_date = datetime.strptime(date_text, '%m月. %d, %Y')
-                        except:
-                            print("Unable to process date", date_text, "from", job_url)
-                            job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
-
+                job_date = parse_date(date_text)
                 location_data = the_location.find(class_='job-info--data')
 
             id_as_number = id_to_number(id_data_text)
