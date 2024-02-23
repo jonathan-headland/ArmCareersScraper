@@ -77,6 +77,9 @@ while count < job_limit and page_count < page_total:
             job_url = base_url + link['href']
             job_details = requests.get(job_url)
             job_soup = BeautifulSoup(job_details.content, 'html.parser')
+            if job_soup is None:
+                print("Warn: unable to process ", page_count, place_on_page, title.text, job_url)
+                continue
             the_id = job_soup.find(class_='job-id')
             id_data = the_id.find(class_='job-info--data')
             the_date = job_soup.find(class_='job-date')
