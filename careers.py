@@ -2,6 +2,7 @@ import requests
 
 from bs4 import BeautifulSoup
 from datetime import datetime
+from dateutil import parser
 
 base_url = 'https://careers.arm.com'
 search_url = base_url + '/search-jobs'
@@ -19,28 +20,30 @@ def id_to_number(a_job_id):
     return result
 
 def parse_date(a_text: str):
-    try:
-        job_date = datetime.strptime(date_text, '%b. %d, %Y')
-    except:
+    formats = [
+        '%b. %d, %Y',
+        '%m/%d/%Y',
+        '%m-%d-%Y',
+        '%m.%d.%Y',
+        '%b.. %d, %Y',
+        '%m月. %d, %Y',  # Chinese date format (month)
+            ]
+    for f in formats :
         try:
-            job_date = datetime.strptime(date_text, '%m/%d/%Y')
+            job_date = datetime.strptime(date_text, f)
+            return job_date
         except:
-            try:
-                job_date = datetime.strptime(date_text, '%m-%d-%Y')
-            except:
-                try:
-                    job_date = datetime.strptime(date_text, '%m.%d.%Y')
-                except:
-                    try:
-                        # nov.. 01, 2023
-                        job_date = datetime.strptime(date_text, '%b.. %d, %Y')
-                    except:
-                        try:
-	                    # Chinese date format (month)
-                            job_date = datetime.strptime(date_text, '%m月. %d, %Y')
-                        except:
-                            print("Unable to process date", date_text, "from", job_url)
-                            job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
+            pass
+
+    try:
+        job_date = parser.parse(date_text)
+        return job_date
+    except:
+        pass
+
+    # fallthrough
+    print("Unable to process date", date_text, "from", job_url)
+    job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
     return job_date
 
 response = requests.get(search_url)
