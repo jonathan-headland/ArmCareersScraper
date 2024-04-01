@@ -1,4 +1,6 @@
 import requests
+import getopt
+import sys
 
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -8,6 +10,11 @@ base_url = 'https://careers.arm.com'
 search_url = base_url + '/search-jobs'
 page_count = 0
 count = 0
+
+def usage():
+    print ("usage:", sys.argv[0], "[-c|--concise]")
+    print("optional arguments:")
+    print("    -c, --concise   suppress page titles in output (useful for Google docs)")
 
 def id_to_number(a_job_id):
     ''' Convert a string in format 2023-10125 to a sortable integer '''
@@ -45,6 +52,19 @@ def parse_date(a_text: str):
     print("Unable to process date", date_text, "from", job_url)
     job_date = datetime.strptime("Jan. 01, 9999", '%b. %d, %Y')
     return job_date
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "c", ["concise"])
+except getopt.GetoptError as err:
+      print (err)
+      usage()
+      sys.exit(2)
+
+is_concise = False
+
+for option, argument in opts:
+    if option in ("-c", "--concise"):
+        is_concise = True;  # No page titles in output
 
 response = requests.get(search_url)
 soup = BeautifulSoup(response.content, 'html.parser')
@@ -130,7 +150,7 @@ for job in job_list:
     page = job["page"]
     line = job["line"]
     identifier = job["id"]
-    title = job["title"]
+    title = job["title"] if not is_concise else ""
     url = job["url"]
     date_str = date.strftime("%Y-%m-%d")
     print_count += 1
